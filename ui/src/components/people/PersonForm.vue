@@ -103,7 +103,7 @@
                 readonly
                 data-cy="birthday"
                 data-vv-validate-on="input"
-                v-validate="'date_format:YYYY-MM-DD'"
+                v-validate="'date_format:yyyy-MM-dd'"
                 v-bind:error-messages="errors.collect('birthday')"
                 v-on="on"
               />
@@ -441,7 +441,7 @@ export default {
     },
 
     addressSaved() {
-      return this.addressWasSaved;
+      return this.WasSaved;
     },
 
     getImageId() {

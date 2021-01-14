@@ -50,7 +50,7 @@
     >
       <template v-slot:item="props">
         <tr>
-          <td>{{ props.item.description }}</td>
+          <td>{{ props.item.description}}</td>
           <td>{{ getDisplayLocation(props.item.location) }}</td>
           <td>
             <template v-if="props.item.active">
@@ -384,7 +384,7 @@ export default {
             this.showSnackbar(this.$t("assets.error-editing-asset"));
           });
       } else {
-        console.log(newAsset);
+        //console.log(newAsset);
         delete newAsset.event_count;
         this.$http
           .post("/api/v1/assets/?include_location=1", newAsset)
@@ -446,7 +446,7 @@ export default {
 
     getDisplayLocation(location, length = 20) {
       if (location && location.description) {
-        let name = location.description;
+        let name = location.address.name;
         if (name && name.length && name.length > 0) {
           if (name.length > length) {
             return `${name.substring(0, length - 3)}...`;

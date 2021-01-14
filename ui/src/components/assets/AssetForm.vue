@@ -15,11 +15,28 @@
           data-cy="description"
         ></v-textarea>
 
+        <v-btn
+          small
+          color="primary"
+          text
+          :disabled="addressWasSaved"
+          @click="changeAddressView(true)"
+        >
+        {{ $t("actions.add-address") }}
+        </v-btn>
+
+        <address-form
+          v-if="showAddressForm"
+          @cancel="changeAddressView"
+          @saved="saveAddress"
+        >
+        </address-form>
+
         <entity-search
           location
           name="location"
           v-model="asset.location"
-          v-validate="'required'"
+          v-validate="checkLocation"
           v-bind:error-messages="errors.first('location')"
         />
       </form>
@@ -60,8 +77,10 @@
 <script>
 import { isEmpty } from "lodash";
 import EntitySearch from "../EntitySearch";
+import AddressForm from "../AddressForm.vue";
+
 export default {
-  components: { "entity-search": EntitySearch },
+  components: { "entity-search": EntitySearch, "address-form": AddressForm, },
   name: "AssetForm",
   props: {
     editMode: {
@@ -81,6 +100,8 @@ export default {
   },
   data: function () {
     return {
+      showAddressForm: false,
+      addressWasSaved: false,
       asset: {},
       save_loading: false,
       add_more_loading: false,
@@ -103,6 +124,11 @@ export default {
     assetKeys() {
       return Object.keys(this.asset);
     },
+
+    addressSaved() {
+      return this.addressWasSaved;
+    },
+
     title() {
       return this.editMode
         ? this.$t("assets.edit-asset")
@@ -115,12 +141,18 @@ export default {
   },
 
   methods: {
+
+    checkLocation(){
+      return this.asset.location;
+    },
+
     cancel() {
       this.$emit("cancel");
     },
 
     // Clear the form and the validators.
     clear() {
+      this.addressWasSaved = false;
       delete this.asset.location;
       for (let key of this.assetKeys) {
         this.asset[key] = "";
@@ -129,12 +161,27 @@ export default {
       this.$validator.reset();
     },
 
+    saveAddress(resp) {
+      this.asset.location = resp;
+      this.addressWasSaved = true;
+      this.showAddressForm = false;
+      this.save();
+    },
+
+    changeAddressView(show) {
+      this.showAddressForm = show;
+    },
+
     save() {
       this.$validator.validateAll().then(() => {
         if (!this.errors.any()) {
           this.asset.active = true;
+          console.log("save()");
+          console.log(this.asset);
           if (this.addMore) this.$emit("addAnother", this.asset);
           else this.$emit("save", this.asset);
+          console.log("Here");
+          console.log(this.asset);
         }
         this.addMore = false;
       });
